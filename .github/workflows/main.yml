@@ -1,0 +1,51 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Prepare www folder automatically
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          cp manifest.json www/manifest.json || true
+
+      - name: 3. Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 4. Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: 5. Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 6. Install Capacitor and Add Android
+        run: |
+          npm install
+          npx cap add android || npx cap sync android
+
+      - name: 7. Build APK via Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 8. Upload Ready-to-Install APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Amali-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
