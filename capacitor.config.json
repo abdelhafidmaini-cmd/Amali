@@ -1,0 +1,8 @@
+{
+  "appId": "com.amali.app",
+  "appName": "عملي",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#0b1120"
+  }
+}
